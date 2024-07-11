@@ -8,7 +8,7 @@
   <h1>Control de LED con ESP32</h1>
   <button onclick="toggleLED()">Encender LED</button>
   <script>
-    const ESP32_IP = "http://TU_ESP32_IP"; // Reemplaza con la IP de tu ESP32
+    const ESP32_IP = "192.168.0.220"; // Reemplaza con la IP de tu ESP32
 
     function toggleLED() {
       fetch(`${ESP32_IP}/led/on`)
