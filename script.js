@@ -59,6 +59,7 @@ $(document).ready(function(){
         if (ledStatusRef) ledStatusRef.off();
         if (chart) chart.destroy();
         temperatureData = [];
+        chart = null; // Asegúrate de restablecer el gráfico
     });
 
     function loadUserData() {
@@ -151,6 +152,7 @@ $(document).ready(function(){
     }
 
     function updateChart(temperature) {
+        if (!chart) return; // Verifica que el gráfico esté inicializado
         var now = new Date();
         temperatureData.push({x: now, y: temperature});
         if (temperatureData.length > 20) { // Muestra solo los últimos 20 valores
