@@ -17,6 +17,8 @@ $(document).ready(function(){
     var userNumber = null;
     var temperatureRef = null;
     var ledStatusRef = null;
+    var temperatureData = [];
+    var chart = null;
 
     function showControlPanel() {
         $("#login-container").hide();
@@ -54,6 +56,8 @@ $(document).ready(function(){
         hideControlPanel();
         if (temperatureRef) temperatureRef.off();
         if (ledStatusRef) ledStatusRef.off();
+        if (chart) chart.destroy();
+        temperatureData = [];
     });
 
     function loadUserData() {
@@ -72,6 +76,7 @@ $(document).ready(function(){
         temperatureRef.on('value', function(snapshot) {
             var temperature = snapshot.val();
             $("#temperature").text(temperature + ' °C');
+            updateChart(temperature);
         });
 
         $("#toggle" + userNumber).click(function(){
@@ -82,6 +87,8 @@ $(document).ready(function(){
                 updateButton($("#toggle" + userNumber), newStatus);
             });
         });
+
+        createChart();
     }
 
     function updateButton(button, status) {
@@ -92,6 +99,67 @@ $(document).ready(function(){
             button.text("Turn on LED");
             button.removeClass("on").addClass("off");
         }
+    }
+
+    function createChart() {
+        var ctx = document.getElementById('temperatureChart').getContext('2d');
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Las etiquetas se actualizarán en tiempo real
+                datasets: [{
+                    label: 'Temperatura',
+                    data: temperatureData,
+                    borderColor: '#21ecf3',
+                    backgroundColor: 'rgba(33, 236, 243, 0.2)',
+                    pointBackgroundColor: '#21ecf3',
+                    pointBorderColor: '#21ecf3',
+                    fill: true,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'minute'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tiempo'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Temperatura (°C)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#ffffff'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateChart(temperature) {
+        var now = new Date();
+        temperatureData.push({x: now, y: temperature});
+        if (temperatureData.length > 20) { // Muestra solo los últimos 20 valores
+            temperatureData.shift();
+        }
+        chart.data.labels.push(now);
+        if (chart.data.labels.length > 20) {
+            chart.data.labels.shift();
+        }
+        chart.update();
     }
 
     hideControlPanel(); // Oculta los botones al cargar la página
