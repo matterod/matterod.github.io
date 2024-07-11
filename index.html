@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de LEDs</title>
+    <title>Control de LEDs y Monitor de Temperatura</title>
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
@@ -14,7 +14,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Control de LEDs</h1>
+        <h1>Control de LEDs y Monitor de Temperatura</h1>
+        <div id="temperature-container">
+            <h2>Temperatura Actual</h2>
+            <p id="temperature">Cargando...</p>
+        </div>
         <div class="button-container">
             <button id="toggle1" class="btn">Toggle LED 1</button>
         </div>
@@ -27,3 +31,4 @@
     </div>
 </body>
 </html>
+
