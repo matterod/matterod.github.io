@@ -16,6 +16,8 @@ $(document).ready(function(){
     var Led1Status;
     var Led2Status;
     var Led3Status;
+    var currentUser = null;
+    var userNumber = null;
     var temperatureData = [];
     var chart = null;
 
@@ -29,56 +31,107 @@ $(document).ready(function(){
         }
     }
 
-    database.ref().on("value", function(snap){
-        Led1Status = snap.val().Led1Status;
-        Led2Status = snap.val().Led2Status;
-        Led3Status = snap.val().Led3Status;
+    function showControlPanel() {
+        $("#login-container").hide();
+        $("#control-container").show();
+    }
 
-        updateButton($("#toggle1"), Led1Status);
-        updateButton($("#toggle2"), Led2Status);
-        updateButton($("#toggle3"), Led3Status);
+    function hideControlPanel() {
+        $("#login-container").show();
+        $("#control-container").hide();
+        $(".button-container").hide();
+    }
+
+    $("#login-button").click(function(){
+        var username = $("#username").val();
+        var password = $("#password").val();
+
+        database.ref('users/' + username).once('value').then(function(snapshot) {
+            var userData = snapshot.val();
+            if (userData && userData.password === password) {
+                currentUser = username;
+                userNumber = username.match(/\d+/)[0]; // Extrae el número del usuario
+                showControlPanel();
+                loadUserData();
+            } else {
+                $("#login-error").text("Invalid username or password.");
+            }
+        }).catch(function(error) {
+            console.error('Error:', error);
+            $("#login-error").text("An error occurred.");
+        });
     });
 
-    $("#toggle1").click(function(){
-        var firebaseRef = firebase.database().ref().child("Led1Status");
-
-        if (Led1Status == "1") {
-            firebaseRef.set("0");
-            Led1Status = "0";
-        } else {
-            firebaseRef.set("1");
-            Led1Status = "1";
-        }
-        updateButton($(this), Led1Status);
+    $("#logout-button").click(function(){
+        currentUser = null;
+        hideControlPanel();
+        if (chart) chart.destroy();
+        temperatureData = [];
     });
 
-    $("#toggle2").click(function(){
-        var firebaseRef = firebase.database().ref().child("Led2Status");
+    function loadUserData() {
+        $(".button-container").hide();
+        $("#button-container" + userNumber).show();
 
-        if (Led2Status == "1") {
-            firebaseRef.set("0");
-            Led2Status = "0";
-        } else {
-            firebaseRef.set("1");
-            Led2Status = "1";
-        }
-        updateButton($(this), Led2Status);
-    });
+        var ledStatusRef1 = database.ref('users/' + currentUser + '/Led1Status');
+        var ledStatusRef2 = database.ref('users/' + currentUser + '/Led2Status');
+        var ledStatusRef3 = database.ref('users/' + currentUser + '/Led3Status');
+        var temperatureRef = database.ref('users/' + currentUser + '/Temperature');
 
-    $("#toggle3").click(function(){
-        var firebaseRef = firebase.database().ref().child("Led3Status");
+        ledStatusRef1.on('value', function(snapshot) {
+            var status = snapshot.val();
+            Led1Status = status;
+            updateButton($("#toggle1"), status);
+        });
 
-        if (Led3Status == "1") {
-            firebaseRef.set("0");
-            Led3Status = "0";
-        } else {
-            firebaseRef.set("1");
-            Led3Status = "1";
-        }
-        updateButton($(this), Led3Status);
-    });
+        ledStatusRef2.on('value', function(snapshot) {
+            var status = snapshot.val();
+            Led2Status = status;
+            updateButton($("#toggle2"), status);
+        });
 
-    // Inicializar gráfico de temperatura
+        ledStatusRef3.on('value', function(snapshot) {
+            var status = snapshot.val();
+            Led3Status = status;
+            updateButton($("#toggle3"), status);
+        });
+
+        temperatureRef.on('value', function(snapshot) {
+            var temperature = snapshot.val();
+            $("#temperature").text(temperature + ' °C');
+            updateChart(temperature);
+        });
+
+        $("#toggle1").click(function(){
+            ledStatusRef1.once('value').then(function(snapshot) {
+                var currentStatus = snapshot.val();
+                var newStatus = currentStatus === "1" ? "0" : "1";
+                ledStatusRef1.set(newStatus);
+                updateButton($("#toggle1"), newStatus);
+            });
+        });
+
+        $("#toggle2").click(function(){
+            ledStatusRef2.once('value').then(function(snapshot) {
+                var currentStatus = snapshot.val();
+                var newStatus = currentStatus === "1" ? "0" : "1";
+                ledStatusRef2.set(newStatus);
+                updateButton($("#toggle2"), newStatus);
+            });
+        });
+
+        $("#toggle3").click(function(){
+            ledStatusRef3.once('value').then(function(snapshot) {
+                var currentStatus = snapshot.val();
+                var newStatus = currentStatus === "1" ? "0" : "1";
+                ledStatusRef3.set(newStatus);
+                updateButton($("#toggle3"), newStatus);
+            });
+        });
+
+        createChart();
+    }
+
     function createChart() {
         var ctx = document.getElementById('temperatureChart').getContext('2d');
         chart = new Chart(ctx, {
@@ -127,7 +180,6 @@ $(document).ready(function(){
         });
     }
 
-    // Actualizar gráfico de temperatura
     function updateChart(temperature) {
         var now = new Date();
         temperatureData.push({x: now, y: temperature});
@@ -141,14 +193,5 @@ $(document).ready(function(){
         chart.update();
     }
 
-    // Leer temperatura de Firebase y actualizar la página
-    var temperatureRef = database.ref('Temperature');
-    temperatureRef.on('value', function(snapshot) {
-        var temperature = snapshot.val();
-        $("#temperature").text(temperature + ' °C');
-        updateChart(temperature);
-    });
-
-    // Crear gráfico al cargar la página
-    createChart();
+    hideControlPanel();
 });
