@@ -91,6 +91,8 @@ $(document).ready(function(){
                 updateButton($("#toggle" + userNumber), newStatus);
             });
         });
+
+        loadTemperatureHistory(); // Carga los datos históricos de temperatura
     }
 
     function updateButton(button, status) {
@@ -163,6 +165,20 @@ $(document).ready(function(){
             chart.data.labels.shift();
         }
         chart.update();
+    }
+
+    function loadTemperatureHistory() {
+        var historyRef = database.ref('users/' + currentUser + '/TemperatureHistory');
+        historyRef.once('value', function(snapshot) {
+            snapshot.forEach(function(childSnapshot) {
+                var timestamp = new Date(parseInt(childSnapshot.key) * 1000); // Convertir la marca de tiempo a fecha
+                var temperature = childSnapshot.val();
+                temperatureData.push({x: timestamp, y: temperature});
+            });
+            if (chart) {
+                chart.update();
+            }
+        });
     }
 
     hideControlPanel(); // Oculta los botones al cargar la página
