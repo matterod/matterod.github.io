@@ -171,7 +171,7 @@ $(document).ready(function(){
         var historyRef = database.ref('users/' + currentUser + '/TemperatureHistory');
         historyRef.once('value', function(snapshot) {
             snapshot.forEach(function(childSnapshot) {
-                var timestamp = new Date(parseInt(childSnapshot.key) * 1000); // Convertir la marca de tiempo a fecha
+                var timestamp = new Date(parseInt(childSnapshot.key)); // Convertir la marca de tiempo a fecha
                 var temperature = childSnapshot.val();
                 temperatureData.push({x: timestamp, y: temperature});
             });
