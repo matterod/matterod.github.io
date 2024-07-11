@@ -27,6 +27,8 @@ body {
     border-radius: 30px;
     padding: 5px;
     transition: all 300ms ease-in-out;
+    display: flex;
+    justify-content: flex-start; /* Ajuste para asegurarse de que el inner-circle esté alineado a la izquierda por defecto */
 }
 
 .toggle-btn > .inner-circle {
