@@ -1,54 +1,78 @@
-body {
-    background: #1a1a1a;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
+var firebaseConfig = {
+    apiKey: "AIzaSyANGLfDfRnsIfN3k-COWI22Y0bi8emK4Os",
+    authDomain: "esp32rinconada.firebaseapp.com",
+    databaseURL: "https://esp32rinconada-default-rtdb.firebaseio.com",
+    projectId: "esp32rinconada",
+    storageBucket: "esp32rinconada.appspot.com",
+    messagingSenderId: "82707406557",
+    appId: "1:82707406557:web:62f5993a30a39b7f130534",
+    measurementId: "G-84QEWN29ZH"
+};
 
-.container {
-    text-align: center;
-}
+firebase.initializeApp(firebaseConfig);
 
-h1 {
-    font-size: 3rem;
-    margin-bottom: 2rem;
-}
+$(document).ready(function(){
+    var database = firebase.database();
+    var Led1Status;
+    var Led2Status;
+    var Led3Status;
 
-.button-container {
-    margin: 1rem 0;
-}
+    function updateButton(button, status) {
+        if (status == "1") {
+            button.text("Turn off " + button.attr('id'));
+            button.removeClass("off").addClass("on");
+        } else {
+            button.text("Turn on " + button.attr('id'));
+            button.removeClass("on").addClass("off");
+        }
+    }
 
-.btn {
-    background-color: #444;
-    border: none;
-    color: white;
-    padding: 1rem 2rem;
-    text-align: center;
-    font-size: 2rem;
-    margin: 0.5rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    border-radius: 5px;
-}
+    database.ref().on("value", function(snap){
+        Led1Status = snap.val().Led1Status;
+        Led2Status = snap.val().Led2Status;
+        Led3Status = snap.val().Led3Status;
 
-.btn:hover {
-    background-color: #666;
-}
+        updateButton($("#toggle1"), Led1Status);
+        updateButton($("#toggle2"), Led2Status);
+        updateButton($("#toggle3"), Led3Status);
+    });
 
-.btn:active {
-    transform: scale(0.95);
-}
+    $("#toggle1").click(function(){
+        var firebaseRef = firebase.database().ref().child("Led1Status");
 
-.btn.on {
-    background-color: #21ecf3;
-    box-shadow: 0 0 10px #21ecf3, 0 0 20px #21ecf3, 0 0 30px #21ecf3;
-}
+        if (Led1Status == "1") {
+            firebaseRef.set("0");
+            Led1Status = "0";
+        } else {
+            firebaseRef.set("1");
+            Led1Status = "1";
+        }
+        updateButton($(this), Led1Status);
+    });
 
-.btn.off {
-    background-color: #444;
-    box-shadow: none;
-}
+    $("#toggle2").click(function(){
+        var firebaseRef = firebase.database().ref().child("Led2Status");
+
+        if (Led2Status == "1") {
+            firebaseRef.set("0");
+            Led2Status = "0";
+        } else {
+            firebaseRef.set("1");
+            Led2Status = "1";
+        }
+        updateButton($(this), Led2Status);
+    });
+
+    $("#toggle3").click(function(){
+        var firebaseRef = firebase.database().ref().child("Led3Status");
+
+        if (Led3Status == "1") {
+            firebaseRef.set("0");
+            Led3Status = "0";
+        } else {
+            firebaseRef.set("1");
+            Led3Status = "1";
+        }
+        updateButton($(this), Led3Status);
+    });
+});
