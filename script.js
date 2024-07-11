@@ -111,7 +111,6 @@ $(document).ready(function(){
         chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [], // Las etiquetas se actualizarán en tiempo real
                 datasets: [{
                     label: 'Temperatura',
                     data: temperatureData,
@@ -156,7 +155,7 @@ $(document).ready(function(){
 
     function updateChart(temperature) {
         if (!chart) return; // Verifica que el gráfico esté inicializado
-        var now = new Date();
+        var now = Date.now();
         console.log('Agregando dato al gráfico:', {x: now, y: temperature});
         temperatureData.push({x: now, y: temperature});
         if (temperatureData.length > 20) { // Muestra solo los últimos 20 valores
