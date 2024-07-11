@@ -6,11 +6,34 @@
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.4/css/all.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <script src="script.js"></script>
 </head>
 <body>
-    <h1>Control de LEDs</h1>
-    <button id="toggle1">Toggle LED 1</button>
-    <button id="toggle2">Toggle LED 2</button>
+    <div class="wrapper">
+        <div class="icon">
+            <i class="fas fa-4x fa-tv"></i>
+        </div>
+        <div class="progress">
+            <div class="toggle-btn1" id="unact1">
+                <div class="inner-circle"></div>
+            </div>
+            <div class="toggle-btn1 active" id="act1">
+                <div class="inner-circle"></div>
+            </div>
+        </div>
+        <div class="icon">
+            <i class="fas fa-4x fa-lightbulb"></i>
+        </div>
+        <div class="progress">
+            <div class="toggle-btn2" id="unact2">
+                <div class="inner-circle"></div>
+            </div>
+            <div class="toggle-btn2 active" id="act2">
+                <div class="inner-circle"></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
