@@ -75,4 +75,11 @@ $(document).ready(function(){
         }
         updateButton($(this), Led3Status);
     });
+
+    // Leer temperatura de Firebase y actualizar la página
+    var temperatureRef = database.ref('Temperature');
+    temperatureRef.on('value', function(snapshot) {
+        var temperature = snapshot.val();
+        $("#temperature").text(temperature + ' °C');
+    });
 });
