@@ -52,6 +52,10 @@ $(document).ready(function(){
     });
 
     function loadUserData() {
+        // Mostrar solo el botón correspondiente al usuario
+        $(".button-container").hide(); // Oculta todos los botones
+        $("#button-container" + userNumber).show(); // Muestra solo el botón del usuario
+
         var ledStatusRef = database.ref('users/' + currentUser + '/Led' + userNumber + 'Status');
         var temperatureRef = database.ref('users/' + currentUser + '/Temperature' + userNumber);
 
@@ -77,10 +81,10 @@ $(document).ready(function(){
 
     function updateButton(button, status) {
         if (status == "1") {
-            button.text("Turn off " + button.attr('id'));
+            button.text("Turn off LED");
             button.removeClass("off").addClass("on");
         } else {
-            button.text("Turn on " + button.attr('id'));
+            button.text("Turn on LED");
             button.removeClass("on").addClass("off");
         }
     }
