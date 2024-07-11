@@ -49,16 +49,19 @@ h1 {
 
 #temperature-container {
     margin-bottom: 2rem;
-}
-
-h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
+    text-align: center;
 }
 
 #temperature {
     font-size: 2rem;
     color: #21ecf3;
+}
+
+#temperatureChart {
+    width: 100%;
+    max-width: 600px;
+    height: 400px;
+    margin: 0 auto;
 }
 
 .button-container {
