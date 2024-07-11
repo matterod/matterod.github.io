@@ -24,6 +24,7 @@ $(document).ready(function(){
     function hideControlPanel() {
         $("#login-container").show();
         $("#control-container").hide();
+        $(".button-container").hide(); // Oculta todos los botones por defecto
     }
 
     $("#login-button").click(function(){
@@ -89,5 +90,5 @@ $(document).ready(function(){
         }
     }
 
-    hideControlPanel();
+    hideControlPanel(); // Oculta los botones al cargar la página
 });
