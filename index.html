@@ -1,30 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Control de LED y Temperatura</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de LEDs</title>
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.4/css/all.css">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </head>
 <body>
-    <div class="wrapper">
-        <a class="icon1">
-            <i class="fas fa-4x fa-tv"></i>
-        </a>
-        <div class="progress">
-            <div class="toggle-btn" id="unact1">
-                <div class="inner-circle"></div>
-            </div>
-            <div class="toggle-btn active" id="act1">
-                <div class="inner-circle"></div>
-            </div>
+    <div class="container">
+        <h1>Control de LEDs</h1>
+        <div class="button-container">
+            <button id="toggle1" class="btn">Toggle LED 1</button>
         </div>
-        <div class="temperature">
-            <h2>Temperature: <span id="temperature">--</span> °C</h2>
+        <div class="button-container">
+            <button id="toggle2" class="btn">Toggle LED 2</button>
         </div>
     </div>
 </body>
