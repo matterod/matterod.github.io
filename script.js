@@ -13,23 +13,12 @@ firebase.initializeApp(firebaseConfig);
 
 $(document).ready(function(){
     var database = firebase.database();
-    var Led1Status;
-    var Led2Status;
-    var Led3Status;
     var currentUser = null;
     var userNumber = null;
+    var temperatureRef = null;
+    var ledStatusRef = null;
     var temperatureData = [];
     var chart = null;
-
-    function updateButton(button, status) {
-        if (status == "1") {
-            button.text("Turn off " + button.attr('id'));
-            button.removeClass("off").addClass("on");
-        } else {
-            button.text("Turn on " + button.attr('id'));
-            button.removeClass("on").addClass("off");
-        }
-    }
 
     function showControlPanel() {
         $("#login-container").hide();
@@ -39,7 +28,7 @@ $(document).ready(function(){
     function hideControlPanel() {
         $("#login-container").show();
         $("#control-container").hide();
-        $(".button-container").hide();
+        $(".button-container").hide(); // Oculta todos los botones por defecto
     }
 
     $("#login-button").click(function(){
@@ -65,35 +54,23 @@ $(document).ready(function(){
     $("#logout-button").click(function(){
         currentUser = null;
         hideControlPanel();
+        if (temperatureRef) temperatureRef.off();
+        if (ledStatusRef) ledStatusRef.off();
         if (chart) chart.destroy();
         temperatureData = [];
     });
 
     function loadUserData() {
-        $(".button-container").hide();
-        $("#button-container" + userNumber).show();
+        // Mostrar solo el botón correspondiente al usuario
+        $(".button-container").hide(); // Oculta todos los botones
+        $("#button-container" + userNumber).show(); // Muestra solo el botón del usuario
 
-        var ledStatusRef1 = database.ref('users/' + currentUser + '/Led1Status');
-        var ledStatusRef2 = database.ref('users/' + currentUser + '/Led2Status');
-        var ledStatusRef3 = database.ref('users/' + currentUser + '/Led3Status');
-        var temperatureRef = database.ref('users/' + currentUser + '/Temperature');
+        ledStatusRef = database.ref('users/' + currentUser + '/Led' + userNumber + 'Status');
+        temperatureRef = database.ref('users/' + currentUser + '/Temperature' + userNumber);
 
-        ledStatusRef1.on('value', function(snapshot) {
+        ledStatusRef.on('value', function(snapshot) {
             var status = snapshot.val();
-            Led1Status = status;
-            updateButton($("#toggle1"), status);
-        });
-
-        ledStatusRef2.on('value', function(snapshot) {
-            var status = snapshot.val();
-            Led2Status = status;
-            updateButton($("#toggle2"), status);
-        });
-
-        ledStatusRef3.on('value', function(snapshot) {
-            var status = snapshot.val();
-            Led3Status = status;
-            updateButton($("#toggle3"), status);
+            updateButton($("#toggle" + userNumber), status);
         });
 
         temperatureRef.on('value', function(snapshot) {
@@ -102,34 +79,26 @@ $(document).ready(function(){
             updateChart(temperature);
         });
 
-        $("#toggle1").click(function(){
-            ledStatusRef1.once('value').then(function(snapshot) {
+        $("#toggle" + userNumber).click(function(){
+            ledStatusRef.once('value').then(function(snapshot) {
                 var currentStatus = snapshot.val();
                 var newStatus = currentStatus === "1" ? "0" : "1";
-                ledStatusRef1.set(newStatus);
-                updateButton($("#toggle1"), newStatus);
-            });
-        });
-
-        $("#toggle2").click(function(){
-            ledStatusRef2.once('value').then(function(snapshot) {
-                var currentStatus = snapshot.val();
-                var newStatus = currentStatus === "1" ? "0" : "1";
-                ledStatusRef2.set(newStatus);
-                updateButton($("#toggle2"), newStatus);
-            });
-        });
-
-        $("#toggle3").click(function(){
-            ledStatusRef3.once('value').then(function(snapshot) {
-                var currentStatus = snapshot.val();
-                var newStatus = currentStatus === "1" ? "0" : "1";
-                ledStatusRef3.set(newStatus);
-                updateButton($("#toggle3"), newStatus);
+                ledStatusRef.set(newStatus);
+                updateButton($("#toggle" + userNumber), newStatus);
             });
         });
 
         createChart();
+    }
+
+    function updateButton(button, status) {
+        if (status == "1") {
+            button.text("Turn off LED");
+            button.removeClass("off").addClass("on");
+        } else {
+            button.text("Turn on LED");
+            button.removeClass("on").addClass("off");
+        }
     }
 
     function createChart() {
@@ -137,7 +106,7 @@ $(document).ready(function(){
         chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [],
+                labels: [], // Las etiquetas se actualizarán en tiempo real
                 datasets: [{
                     label: 'Temperatura',
                     data: temperatureData,
@@ -183,7 +152,7 @@ $(document).ready(function(){
     function updateChart(temperature) {
         var now = new Date();
         temperatureData.push({x: now, y: temperature});
-        if (temperatureData.length > 20) {
+        if (temperatureData.length > 20) { // Muestra solo los últimos 20 valores
             temperatureData.shift();
         }
         chart.data.labels.push(now);
@@ -193,5 +162,5 @@ $(document).ready(function(){
         chart.update();
     }
 
-    hideControlPanel();
+    hideControlPanel(); // Oculta los botones al cargar la página
 });
