@@ -1,12 +1,14 @@
+// script.js
+
 var firebaseConfig = {
-    apiKey: "AIzaSyANGLfDfRnsIfN3k-COWI22Y0bi8emK4Os",
-    authDomain: "esp32rinconada.firebaseapp.com",
-    databaseURL: "https://esp32rinconada-default-rtdb.firebaseio.com",
-    projectId: "esp32rinconada",
-    storageBucket: "esp32rinconada.appspot.com",
-    messagingSenderId: "82707406557",
-    appId: "1:82707406557:web:62f5993a30a39b7f130534",
-    measurementId: "G-84QEWN29ZH"
+    apiKey: "your-api-key",
+    authDomain: "your-auth-domain",
+    databaseURL: "your-database-url",
+    projectId: "your-project-id",
+    storageBucket: "your-storage-bucket",
+    messagingSenderId: "your-messaging-sender-id",
+    appId: "your-app-id",
+    measurementId: "your-measurement-id"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -28,7 +30,7 @@ $(document).ready(function(){
     function hideControlPanel() {
         $("#login-container").show();
         $("#control-container").hide();
-        $(".button-container").hide(); // Oculta todos los botones por defecto
+        $(".button-container").hide();
     }
 
     $("#login-button").click(function(){
@@ -61,9 +63,8 @@ $(document).ready(function(){
     });
 
     function loadUserData() {
-        // Mostrar solo el botón correspondiente al usuario
-        $(".button-container").hide(); // Oculta todos los botones
-        $("#button-container" + userNumber).show(); // Muestra solo el botón del usuario
+        $(".button-container").hide();
+        $("#button-container" + userNumber).show();
 
         ledStatusRef = database.ref('users/' + currentUser + '/Led' + userNumber + 'Status');
         temperatureRef = database.ref('users/' + currentUser + '/Temperature' + userNumber);
@@ -106,7 +107,7 @@ $(document).ready(function(){
         chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [], // Las etiquetas se actualizarán en tiempo real
+                labels: [],
                 datasets: [{
                     label: 'Temperatura',
                     data: temperatureData,
@@ -152,7 +153,7 @@ $(document).ready(function(){
     function updateChart(temperature) {
         var now = new Date();
         temperatureData.push({x: now, y: temperature});
-        if (temperatureData.length > 20) { // Muestra solo los últimos 20 valores
+        if (temperatureData.length > 20) {
             temperatureData.shift();
         }
         chart.data.labels.push(now);
@@ -162,5 +163,5 @@ $(document).ready(function(){
         chart.update();
     }
 
-    hideControlPanel(); // Oculta los botones al cargar la página
+    hideControlPanel();
 });
