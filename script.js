@@ -111,9 +111,10 @@ $(document).ready(function(){
     chart = new Chart(ctx, {
         type: 'line',
         data: {
+            labels: [], // Asegúrate de que las etiquetas estén inicializadas
             datasets: [{
                 label: 'Temperatura',
-                data: temperatureData,
+                data: [], // Asegúrate de que los datos estén inicializados
                 borderColor: '#21ecf3',
                 backgroundColor: 'rgba(33, 236, 243, 0.2)',
                 pointBackgroundColor: '#21ecf3',
@@ -127,7 +128,7 @@ $(document).ready(function(){
                 x: {
                     type: 'time',
                     time: {
-                        unit: 'hour' // Ajuste aquí
+                        unit: 'hour'
                     },
                     title: {
                         display: true,
@@ -157,9 +158,9 @@ function updateChart(temperature) {
     if (!chart) return; // Verifica que el gráfico esté inicializado
     var now = Date.now();
     console.log('Agregando dato al gráfico:', {x: now, y: temperature});
-    temperatureData.push({x: now, y: temperature});
-    if (temperatureData.length > 20) { // Muestra solo los últimos 20 valores
-        temperatureData.shift();
+    chart.data.datasets[0].data.push({x: now, y: temperature});
+    if (chart.data.datasets[0].data.length > 20) { // Muestra solo los últimos 20 valores
+        chart.data.datasets[0].data.shift();
     }
     chart.data.labels.push(now);
     if (chart.data.labels.length > 20) {
@@ -168,20 +169,21 @@ function updateChart(temperature) {
     chart.update();
 }
 
-    function loadTemperatureHistory() {
-        var historyRef = database.ref('users/' + currentUser + '/TemperatureHistory');
-        historyRef.once('value', function(snapshot) {
-            snapshot.forEach(function(childSnapshot) {
-                var timestamp = new Date(parseInt(childSnapshot.key)); // Convertir la marca de tiempo a fecha
-                var temperature = childSnapshot.val();
-                console.log('Cargando dato histórico:', {x: timestamp, y: temperature});
-                temperatureData.push({x: timestamp, y: temperature});
-            });
-            if (chart) {
-                chart.update();
-            }
+function loadTemperatureHistory() {
+    var historyRef = database.ref('users/' + currentUser + '/TemperatureHistory');
+    historyRef.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+            var timestamp = new Date(parseInt(childSnapshot.key)); // Convertir la marca de tiempo a fecha
+            var temperature = childSnapshot.val();
+            console.log('Cargando dato histórico:', {x: timestamp, y: temperature});
+            chart.data.datasets[0].data.push({x: timestamp, y: temperature});
+            chart.data.labels.push(timestamp);
         });
-    }
+        if (chart) {
+            chart.update();
+        }
+    });
+}
 
     hideControlPanel(); // Oculta los botones al cargar la página
 });
