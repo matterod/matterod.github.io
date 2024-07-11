@@ -70,6 +70,8 @@ $(document).ready(function(){
         ledStatusRef = database.ref('users/' + currentUser + '/Led' + userNumber + 'Status');
         temperatureRef = database.ref('users/' + currentUser + '/Temperature' + userNumber);
 
+        loadTemperatureHistory(); // Carga los datos históricos de temperatura
+
         ledStatusRef.on('value', function(snapshot) {
             var status = snapshot.val();
             updateButton($("#toggle" + userNumber), status);
@@ -77,6 +79,7 @@ $(document).ready(function(){
 
         temperatureRef.on('value', function(snapshot) {
             var temperature = snapshot.val();
+            console.log('Temperatura actual: ', temperature);
             $("#temperature").text(temperature + ' °C');
             if (chart) { // Verifica si el gráfico ha sido creado antes de actualizarlo
                 updateChart(temperature);
@@ -91,8 +94,6 @@ $(document).ready(function(){
                 updateButton($("#toggle" + userNumber), newStatus);
             });
         });
-
-        loadTemperatureHistory(); // Carga los datos históricos de temperatura
     }
 
     function updateButton(button, status) {
@@ -156,6 +157,7 @@ $(document).ready(function(){
     function updateChart(temperature) {
         if (!chart) return; // Verifica que el gráfico esté inicializado
         var now = new Date();
+        console.log('Agregando dato al gráfico:', {x: now, y: temperature});
         temperatureData.push({x: now, y: temperature});
         if (temperatureData.length > 20) { // Muestra solo los últimos 20 valores
             temperatureData.shift();
@@ -173,6 +175,7 @@ $(document).ready(function(){
             snapshot.forEach(function(childSnapshot) {
                 var timestamp = new Date(parseInt(childSnapshot.key)); // Convertir la marca de tiempo a fecha
                 var temperature = childSnapshot.val();
+                console.log('Cargando dato histórico:', {x: timestamp, y: temperature});
                 temperatureData.push({x: timestamp, y: temperature});
             });
             if (chart) {
