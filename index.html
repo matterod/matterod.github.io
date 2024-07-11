@@ -1,22 +1,30 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-<head>
-  <title>ESP32 LED Control</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
-  <h1>Control de LED con ESP32</h1>
-  <button onclick="toggleLED()">Encender LED</button>
-  <script>
-    const ESP32_IP = "192.168.0.220"; // Reemplaza con la IP de tu ESP32
+    <head>
+        <meta charset="utf-8">
+        <title>Single toggle</title>
+        <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
+        <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.4/css/all.css">
 
-    function toggleLED() {
-      fetch(`${ESP32_IP}/led/on`)
-      .then(response => response.text())
-      .then(data => {
-        alert(data);
-      });
-    }
-  </script>
-</body>
+        <script src = "script.js"></script>
+        <link rel="stylesheet" type="text/css" href ="style.css">
+    </head>
+    <body>
+        <div class = "wrapper">
+            <a class = "icon1" >
+				<i class="fas fa-4x fa-tv"></i>
+			</a>
+            <div class = "progress">
+                <div class = "toggle-btn" id ="unact">
+                    <div class = "inner-circle"></div>
+                </div>
+                <div class = "toggle-btn active" id ="act">
+                    <div class = inner-circle></div>
+                </div>
+            </div>
+            
+        </div>
+    </body>
 </html>
