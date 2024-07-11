@@ -15,6 +15,8 @@ $(document).ready(function(){
     var database = firebase.database();
     var currentUser = null;
     var userNumber = null;
+    var temperatureRef = null;
+    var ledStatusRef = null;
 
     function showControlPanel() {
         $("#login-container").hide();
@@ -50,6 +52,8 @@ $(document).ready(function(){
     $("#logout-button").click(function(){
         currentUser = null;
         hideControlPanel();
+        if (temperatureRef) temperatureRef.off();
+        if (ledStatusRef) ledStatusRef.off();
     });
 
     function loadUserData() {
@@ -57,8 +61,8 @@ $(document).ready(function(){
         $(".button-container").hide(); // Oculta todos los botones
         $("#button-container" + userNumber).show(); // Muestra solo el botón del usuario
 
-        var ledStatusRef = database.ref('users/' + currentUser + '/Led' + userNumber + 'Status');
-        var temperatureRef = database.ref('users/' + currentUser + '/Temperature' + userNumber);
+        ledStatusRef = database.ref('users/' + currentUser + '/Led' + userNumber + 'Status');
+        temperatureRef = database.ref('users/' + currentUser + '/Temperature' + userNumber);
 
         ledStatusRef.on('value', function(snapshot) {
             var status = snapshot.val();
