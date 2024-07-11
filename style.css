@@ -18,6 +18,20 @@ h1 {
     margin-bottom: 2rem;
 }
 
+#temperature-container {
+    margin-bottom: 2rem;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+#temperature {
+    font-size: 2rem;
+    color: #21ecf3;
+}
+
 .button-container {
     margin: 1rem 0;
 }
