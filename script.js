@@ -41,6 +41,7 @@ $(document).ready(function(){
                 currentUser = username;
                 userNumber = username.match(/\d+/)[0]; // Extrae el número del usuario
                 showControlPanel();
+                createChart(); // Asegúrate de crear el gráfico antes de cargar los datos
                 loadUserData();
             } else {
                 $("#login-error").text("Invalid username or password.");
@@ -76,7 +77,9 @@ $(document).ready(function(){
         temperatureRef.on('value', function(snapshot) {
             var temperature = snapshot.val();
             $("#temperature").text(temperature + ' °C');
-            updateChart(temperature);
+            if (chart) { // Verifica si el gráfico ha sido creado antes de actualizarlo
+                updateChart(temperature);
+            }
         });
 
         $("#toggle" + userNumber).click(function(){
@@ -87,8 +90,6 @@ $(document).ready(function(){
                 updateButton($("#toggle" + userNumber), newStatus);
             });
         });
-
-        createChart();
     }
 
     function updateButton(button, status) {
