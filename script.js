@@ -15,6 +15,7 @@ $(document).ready(function(){
     var database = firebase.database();
     var Led1Status;
     var Led2Status;
+    var Led3Status;
 
     function updateButton(button, status) {
         if (status == "1") {
@@ -29,15 +30,17 @@ $(document).ready(function(){
     database.ref().on("value", function(snap){
         Led1Status = snap.val().Led1Status;
         Led2Status = snap.val().Led2Status;
+        Led3Status = snap.val().Led3Status;
 
         updateButton($("#toggle1"), Led1Status);
         updateButton($("#toggle2"), Led2Status);
+        updateButton($("#toggle3"), Led3Status);
     });
 
     $("#toggle1").click(function(){
         var firebaseRef = firebase.database().ref().child("Led1Status");
 
-        if (Led1Status == "1") {    // post to firebase
+        if (Led1Status == "1") {
             firebaseRef.set("0");
             Led1Status = "0";
         } else {
@@ -50,7 +53,7 @@ $(document).ready(function(){
     $("#toggle2").click(function(){
         var firebaseRef = firebase.database().ref().child("Led2Status");
 
-        if (Led2Status == "1") {    // post to firebase
+        if (Led2Status == "1") {
             firebaseRef.set("0");
             Led2Status = "0";
         } else {
@@ -58,5 +61,18 @@ $(document).ready(function(){
             Led2Status = "1";
         }
         updateButton($(this), Led2Status);
+    });
+
+    $("#toggle3").click(function(){
+        var firebaseRef = firebase.database().ref().child("Led3Status");
+
+        if (Led3Status == "1") {
+            firebaseRef.set("0");
+            Led3Status = "0";
+        } else {
+            firebaseRef.set("1");
+            Led3Status = "1";
+        }
+        updateButton($(this), Led3Status);
     });
 });
