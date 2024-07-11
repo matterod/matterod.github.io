@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>ESP32 LED Control</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <h1>Control de LED con ESP32</h1>
+  <button onclick="toggleLED()">Encender LED</button>
+  <script>
+    const ESP32_IP = "http://TU_ESP32_IP"; // Reemplaza con la IP de tu ESP32
+
+    function toggleLED() {
+      fetch(`${ESP32_IP}/led/on`)
+      .then(response => response.text())
+      .then(data => {
+        alert(data);
+      });
+    }
+  </script>
+</body>
+</html>
