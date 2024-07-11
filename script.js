@@ -19,25 +19,9 @@ $(document).ready(function(){
     database.ref().on("value", function(snap){
         Led1Status = snap.val().Led1Status;
         Led2Status = snap.val().Led2Status;
-
-        if(Led1Status == "1"){    // check from the firebase
-            document.getElementById("unact1").style.display = "none";
-            document.getElementById("act1").style.display = "block";
-        } else {
-            document.getElementById("unact1").style.display = "block";
-            document.getElementById("act1").style.display = "none";
-        }
-
-        if(Led2Status == "1"){    // check from the firebase
-            document.getElementById("unact2").style.display = "none";
-            document.getElementById("act2").style.display = "block";
-        } else {
-            document.getElementById("unact2").style.display = "block";
-            document.getElementById("act2").style.display = "none";
-        }
     });
 
-    $(".toggle-btn1").click(function(){
+    $("#toggle1").click(function(){
         var firebaseRef = firebase.database().ref().child("Led1Status");
 
         if(Led1Status == "1"){    // post to firebase
@@ -49,7 +33,7 @@ $(document).ready(function(){
         }
     });
 
-    $(".toggle-btn2").click(function(){
+    $("#toggle2").click(function(){
         var firebaseRef = firebase.database().ref().child("Led2Status");
 
         if(Led2Status == "1"){    // post to firebase
