@@ -61,7 +61,6 @@ $(document).ready(function(){
         temperatureData = [];
         chart = null; // Asegúrate de restablecer el gráfico
     });
-
     function loadUserData() {
         $(".button-container").hide();
         $("#button-container" + userNumber).show();
@@ -77,9 +76,14 @@ $(document).ready(function(){
         temperatureRef.on('value', function(snapshot) {
             var readings = snapshot.val();
             temperatureData = [];
+            var latestTemperature = null;
             for (var timestamp in readings) {
                 var temperature = readings[timestamp];
                 temperatureData.push({ x: new Date(parseInt(timestamp)), y: temperature });
+                latestTemperature = temperature; // Actualiza la temperatura más reciente
+            }
+            if (latestTemperature !== null) {
+                $("#temperature").text(latestTemperature + " °C"); // Muestra la temperatura más reciente
             }
             if (chart) {
                 chart.data.datasets[0].data = temperatureData;
@@ -167,5 +171,6 @@ $(document).ready(function(){
         }
         chart.update();
     }
+
     hideControlPanel(); // Oculta los botones al cargar la página
 });
