@@ -1,16 +1,3 @@
-var firebaseConfig = {
-    apiKey: "AIzaSyANGLfDfRnsIfN3k-COWI22Y0bi8emK4Os",
-    authDomain: "esp32rinconada.firebaseapp.com",
-    databaseURL: "https://esp32rinconada-default-rtdb.firebaseio.com",
-    projectId: "esp32rinconada",
-    storageBucket: "esp32rinconada.appspot.com",
-    messagingSenderId: "82707406557",
-    appId: "1:82707406557:web:62f5993a30a39b7f130534",
-    measurementId: "G-84QEWN29ZH"
-};
-
-firebase.initializeApp(firebaseConfig);
-
 $(document).ready(function(){
     var database = firebase.database();
     var currentUser = null;
@@ -77,9 +64,14 @@ $(document).ready(function(){
         temperatureRef.on('value', function(snapshot) {
             var readings = snapshot.val();
             temperatureData = [];
+            var latestTemperature = null;
             for (var timestamp in readings) {
                 var temperature = readings[timestamp];
                 temperatureData.push({ x: new Date(parseInt(timestamp)), y: temperature });
+                latestTemperature = temperature; // Actualiza la temperatura más reciente
+            }
+            if (latestTemperature !== null) {
+                $("#temperature").text(latestTemperature + " °C"); // Muestra la temperatura más reciente
             }
             if (chart) {
                 chart.data.datasets[0].data = temperatureData;
