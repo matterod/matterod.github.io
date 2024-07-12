@@ -167,6 +167,5 @@ $(document).ready(function(){
         }
         chart.update();
     }
-
     hideControlPanel(); // Oculta los botones al cargar la página
 });
