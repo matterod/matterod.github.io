@@ -1,12 +1,12 @@
 var firebaseConfig = {
-    apiKey: "tu_api_key",
-    authDomain: "tu_auth_domain",
-    databaseURL: "tu_database_url",
-    projectId: "tu_project_id",
-    storageBucket: "tu_storage_bucket",
-    messagingSenderId: "tu_messaging_sender_id",
-    appId: "tu_app_id",
-    measurementId: "tu_measurement_id"
+    apiKey: "AIzaSyANGLfDfRnsIfN3k-COWI22Y0bi8emK4Os",
+    authDomain: "esp32rinconada.firebaseapp.com",
+    databaseURL: "https://esp32rinconada-default-rtdb.firebaseio.com",
+    projectId: "esp32rinconada",
+    storageBucket: "esp32rinconada.appspot.com",
+    messagingSenderId: "82707406557",
+    appId: "1:82707406557:web:62f5993a30a39b7f130534",
+    measurementId: "G-84QEWN29ZH"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -17,8 +17,8 @@ $(document).ready(function(){
     var userNumber = null;
     var temperatureRef = null;
     var ledStatusRef = null;
-    var temperatureData = []; // Array para almacenar los datos de temperatura para el gráfico
-    var chart = null; // Variable para almacenar la instancia del gráfico
+    var temperatureData = [];
+    var chart = null;
 
     function showControlPanel() {
         $("#login-container").hide();
@@ -41,6 +41,7 @@ $(document).ready(function(){
                 currentUser = username;
                 userNumber = username.match(/\d+/)[0]; // Extrae el número del usuario
                 showControlPanel();
+                createChart(); // Asegúrate de crear el gráfico antes de cargar los datos
                 loadUserData();
             } else {
                 $("#login-error").text("Invalid username or password.");
@@ -56,30 +57,40 @@ $(document).ready(function(){
         hideControlPanel();
         if (temperatureRef) temperatureRef.off();
         if (ledStatusRef) ledStatusRef.off();
-        if (chart) chart.destroy(); // Destruye el gráfico al cerrar sesión
-        temperatureData = []; // Limpia los datos del gráfico
-        chart = null; // Restablece la instancia del gráfico
+        if (chart) chart.destroy();
+        temperatureData = [];
+        chart = null; // Asegúrate de restablecer el gráfico
     });
-
     function loadUserData() {
-        // Mostrar solo el botón correspondiente al usuario
-        $(".button-container").hide(); // Oculta todos los botones
-        $("#button-container" + userNumber).show(); // Muestra solo el botón del usuario
-
+        $(".button-container").hide();
+        $("#button-container" + userNumber).show();
+    
         ledStatusRef = database.ref('users/' + currentUser + '/Led' + userNumber + 'Status');
-        temperatureRef = database.ref('users/' + currentUser + '/Temperature' + userNumber);
-
+        temperatureRef = database.ref('users/' + currentUser + '/TemperatureReadings');
+    
         ledStatusRef.on('value', function(snapshot) {
             var status = snapshot.val();
             updateButton($("#toggle" + userNumber), status);
         });
-
+    
         temperatureRef.on('value', function(snapshot) {
-            var temperature = snapshot.val();
-            $("#temperature").text(temperature + ' °C');
-            updateChart(temperature); // Actualiza el gráfico con la nueva temperatura
+            var readings = snapshot.val();
+            temperatureData = [];
+            var latestTemperature = null;
+            for (var timestamp in readings) {
+                var temperature = readings[timestamp];
+                temperatureData.push({ x: new Date(parseInt(timestamp)), y: temperature });
+                latestTemperature = temperature; // Actualiza la temperatura más reciente
+            }
+            if (latestTemperature !== null) {
+                $("#temperature").text(latestTemperature + " °C"); // Muestra la temperatura más reciente
+            }
+            if (chart) {
+                chart.data.datasets[0].data = temperatureData;
+                chart.update();
+            }
         });
-
+    
         $("#toggle" + userNumber).click(function(){
             ledStatusRef.once('value').then(function(snapshot) {
                 var currentStatus = snapshot.val();
@@ -88,8 +99,6 @@ $(document).ready(function(){
                 updateButton($("#toggle" + userNumber), newStatus);
             });
         });
-
-        createChart(); // Crea el gráfico al cargar los datos del usuario
     }
 
     function updateButton(button, status) {
@@ -107,6 +116,7 @@ $(document).ready(function(){
         chart = new Chart(ctx, {
             type: 'line',
             data: {
+                labels: [], // Las etiquetas se actualizarán en tiempo real
                 datasets: [{
                     label: 'Temperatura',
                     data: temperatureData,
@@ -121,20 +131,13 @@ $(document).ready(function(){
             options: {
                 scales: {
                     x: {
-                        type: 'realtime',
-                        realtime: {
-                            duration: 600000, // Duración en milisegundos para mantener los datos (10 minutos)
-                            refresh: 1000, // Frecuencia de actualización en milisegundos (1 segundo)
-                            delay: 2000, // Retraso inicial en milisegundos (2 segundos)
-                            onRefresh: function(chart) {
-                                // Actualiza el gráfico con los nuevos datos
-                                chart.data.datasets.forEach(function(dataset) {
-                                    dataset.data.push({
-                                        x: Date.now(),
-                                        y: temperatureData.length > 0 ? temperatureData[temperatureData.length - 1].y : null
-                                    });
-                                });
-                            }
+                        type: 'time',
+                        time: {
+                            unit: 'minute'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tiempo'
                         }
                     },
                     y: {
@@ -157,14 +160,16 @@ $(document).ready(function(){
     }
 
     function updateChart(temperature) {
-        var now = Date.now();
-        temperatureData.push({ x: now, y: parseFloat(temperature) });
+        var now = new Date();
+        temperatureData.push({ x: now, y: temperature });
         if (temperatureData.length > 20) {
             temperatureData.shift();
         }
-        if (chart) {
-            chart.update(); // Actualiza el gráfico cuando se agregan nuevos datos
+        chart.data.labels.push(now);
+        if (chart.data.labels.length > 20) {
+            chart.data.labels.shift();
         }
+        chart.update();
     }
 
     hideControlPanel(); // Oculta los botones al cargar la página
