@@ -41,7 +41,6 @@ $(document).ready(function(){
                 currentUser = username;
                 userNumber = username.match(/\d+/)[0]; // Extrae el número del usuario
                 showControlPanel();
-                createChart(); // Asegúrate de crear el gráfico antes de cargar los datos
                 loadUserData();
             } else {
                 $("#login-error").text("Invalid username or password.");
@@ -57,40 +56,25 @@ $(document).ready(function(){
         hideControlPanel();
         if (temperatureRef) temperatureRef.off();
         if (ledStatusRef) ledStatusRef.off();
-        if (chart) chart.destroy();
-        temperatureData = [];
-        chart = null; // Asegúrate de restablecer el gráfico
     });
     function loadUserData() {
-        $(".button-container").hide();
-        $("#button-container" + userNumber).show();
-    
+        // Mostrar solo el botón correspondiente al usuario
+        $(".button-container").hide(); // Oculta todos los botones
+        $("#button-container" + userNumber).show(); // Muestra solo el botón del usuario
+
         ledStatusRef = database.ref('users/' + currentUser + '/Led' + userNumber + 'Status');
-        temperatureRef = database.ref('users/' + currentUser + '/TemperatureReadings');
-    
+        temperatureRef = database.ref('users/' + currentUser + '/Temperature' + userNumber);
+
         ledStatusRef.on('value', function(snapshot) {
             var status = snapshot.val();
             updateButton($("#toggle" + userNumber), status);
         });
-    
+
         temperatureRef.on('value', function(snapshot) {
-            var readings = snapshot.val();
-            temperatureData = [];
-            var latestTemperature = null;
-            for (var timestamp in readings) {
-                var temperature = readings[timestamp];
-                temperatureData.push({ x: new Date(parseInt(timestamp)), y: temperature });
-                latestTemperature = temperature; // Actualiza la temperatura más reciente
-            }
-            if (latestTemperature !== null) {
-                $("#temperature").text(latestTemperature + " °C"); // Muestra la temperatura más reciente
-            }
-            if (chart) {
-                chart.data.datasets[0].data = temperatureData;
-                chart.update();
-            }
+            var temperature = snapshot.val();
+            $("#temperature").text(temperature + ' °C');
         });
-    
+
         $("#toggle" + userNumber).click(function(){
             ledStatusRef.once('value').then(function(snapshot) {
                 var currentStatus = snapshot.val();
@@ -159,17 +143,14 @@ $(document).ready(function(){
         });
     }
 
-    function updateChart(temperature) {
-        var now = new Date();
-        temperatureData.push({ x: now, y: temperature });
-        if (temperatureData.length > 20) {
-            temperatureData.shift();
+    function updateButton(button, status) {
+        if (status == "1") {
+            button.text("Turn off LED");
+            button.removeClass("off").addClass("on");
+        } else {
+            button.text("Turn on LED");
+            button.removeClass("on").addClass("off");
         }
-        chart.data.labels.push(now);
-        if (chart.data.labels.length > 20) {
-            chart.data.labels.shift();
-        }
-        chart.update();
     }
 
     hideControlPanel(); // Oculta los botones al cargar la página
