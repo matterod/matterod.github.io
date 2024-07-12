@@ -61,18 +61,19 @@ $(document).ready(function(){
         temperatureData = [];
         chart = null; // Asegúrate de restablecer el gráfico
     });
+
     function loadUserData() {
         $(".button-container").hide();
         $("#button-container" + userNumber).show();
-    
+
         ledStatusRef = database.ref('users/' + currentUser + '/Led' + userNumber + 'Status');
         temperatureRef = database.ref('users/' + currentUser + '/TemperatureReadings');
-    
+
         ledStatusRef.on('value', function(snapshot) {
             var status = snapshot.val();
             updateButton($("#toggle" + userNumber), status);
         });
-    
+
         temperatureRef.on('value', function(snapshot) {
             var readings = snapshot.val();
             temperatureData = [];
@@ -90,7 +91,7 @@ $(document).ready(function(){
                 chart.update();
             }
         });
-    
+
         $("#toggle" + userNumber).click(function(){
             ledStatusRef.once('value').then(function(snapshot) {
                 var currentStatus = snapshot.val();
