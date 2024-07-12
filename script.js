@@ -1,12 +1,12 @@
 var firebaseConfig = {
-    apiKey: "AIzaSyANGLfDfRnsIfN3k-COWI22Y0bi8emK4Os",
-    authDomain: "esp32rinconada.firebaseapp.com",
-    databaseURL: "https://esp32rinconada-default-rtdb.firebaseio.com",
-    projectId: "esp32rinconada",
-    storageBucket: "esp32rinconada.appspot.com",
-    messagingSenderId: "82707406557",
-    appId: "1:82707406557:web:62f5993a30a39b7f130534",
-    measurementId: "G-84QEWN29ZH"
+    apiKey: "tu_api_key",
+    authDomain: "tu_auth_domain",
+    databaseURL: "tu_database_url",
+    projectId: "tu_project_id",
+    storageBucket: "tu_storage_bucket",
+    messagingSenderId: "tu_messaging_sender_id",
+    appId: "tu_app_id",
+    measurementId: "tu_measurement_id"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -17,8 +17,8 @@ $(document).ready(function(){
     var userNumber = null;
     var temperatureRef = null;
     var ledStatusRef = null;
-    var temperatureData = [];
-    var chart = null;
+    var temperatureData = []; // Array para almacenar los datos de temperatura para el gráfico
+    var chart = null; // Variable para almacenar la instancia del gráfico
 
     function showControlPanel() {
         $("#login-container").hide();
@@ -56,7 +56,11 @@ $(document).ready(function(){
         hideControlPanel();
         if (temperatureRef) temperatureRef.off();
         if (ledStatusRef) ledStatusRef.off();
+        if (chart) chart.destroy(); // Destruye el gráfico al cerrar sesión
+        temperatureData = []; // Limpia los datos del gráfico
+        chart = null; // Restablece la instancia del gráfico
     });
+
     function loadUserData() {
         // Mostrar solo el botón correspondiente al usuario
         $(".button-container").hide(); // Oculta todos los botones
@@ -73,6 +77,7 @@ $(document).ready(function(){
         temperatureRef.on('value', function(snapshot) {
             var temperature = snapshot.val();
             $("#temperature").text(temperature + ' °C');
+            updateChart(temperature); // Actualiza el gráfico con la nueva temperatura
         });
 
         $("#toggle" + userNumber).click(function(){
@@ -83,6 +88,8 @@ $(document).ready(function(){
                 updateButton($("#toggle" + userNumber), newStatus);
             });
         });
+
+        createChart(); // Crea el gráfico al cargar los datos del usuario
     }
 
     function updateButton(button, status) {
@@ -100,7 +107,6 @@ $(document).ready(function(){
         chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [], // Las etiquetas se actualizarán en tiempo real
                 datasets: [{
                     label: 'Temperatura',
                     data: temperatureData,
@@ -115,13 +121,20 @@ $(document).ready(function(){
             options: {
                 scales: {
                     x: {
-                        type: 'time',
-                        time: {
-                            unit: 'minute'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Tiempo'
+                        type: 'realtime',
+                        realtime: {
+                            duration: 600000, // Duración en milisegundos para mantener los datos (10 minutos)
+                            refresh: 1000, // Frecuencia de actualización en milisegundos (1 segundo)
+                            delay: 2000, // Retraso inicial en milisegundos (2 segundos)
+                            onRefresh: function(chart) {
+                                // Actualiza el gráfico con los nuevos datos
+                                chart.data.datasets.forEach(function(dataset) {
+                                    dataset.data.push({
+                                        x: Date.now(),
+                                        y: temperatureData.length > 0 ? temperatureData[temperatureData.length - 1].y : null
+                                    });
+                                });
+                            }
                         }
                     },
                     y: {
@@ -143,13 +156,14 @@ $(document).ready(function(){
         });
     }
 
-    function updateButton(button, status) {
-        if (status == "1") {
-            button.text("Turn off LED");
-            button.removeClass("off").addClass("on");
-        } else {
-            button.text("Turn on LED");
-            button.removeClass("on").addClass("off");
+    function updateChart(temperature) {
+        var now = Date.now();
+        temperatureData.push({ x: now, y: parseFloat(temperature) });
+        if (temperatureData.length > 20) {
+            temperatureData.shift();
+        }
+        if (chart) {
+            chart.update(); // Actualiza el gráfico cuando se agregan nuevos datos
         }
     }
 
