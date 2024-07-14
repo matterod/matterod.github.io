@@ -1,6 +1,5 @@
 var firebaseConfig = {
     apiKey: "AIzaSyANGLfDfRnsIfN3k-COWI22Y0bi8emK4Os",
-    apiKey: "your-api-key",
     authDomain: "esp32rinconada.firebaseapp.com",
     databaseURL: "https://esp32rinconada-default-rtdb.firebaseio.com",
     projectId: "esp32rinconada",
