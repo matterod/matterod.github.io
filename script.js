@@ -1,5 +1,6 @@
 var firebaseConfig = {
     apiKey: "AIzaSyANGLfDfRnsIfN3k-COWI22Y0bi8emK4Os",
+    apiKey: "your-api-key",
     authDomain: "esp32rinconada.firebaseapp.com",
     databaseURL: "https://esp32rinconada-default-rtdb.firebaseio.com",
     projectId: "esp32rinconada",
@@ -35,9 +36,18 @@ $(document).ready(function(){
         firebase.auth().signInWithPopup(provider)
             .then((result) => {
                 currentUser = result.user;
+                // Obtener UID del usuario autenticado
+                var uid = currentUser.uid;
+                console.log("Usuario autenticado con UID:", uid);
+                
+                // Asociar dispositivo con el usuario
+                database.ref('devices/device1').set({
+                    owner: uid
+                });
+
                 showControlPanel();
                 createChart(); // Asegúrate de crear el gráfico antes de cargar los datos
-                loadUserData();
+                loadUserData(uid); // Pasar el UID para cargar datos específicos del usuario
             })
             .catch((error) => {
                 $("#login-error").text("Login failed: " + error.message);
@@ -57,11 +67,10 @@ $(document).ready(function(){
         });
     });
 
-    function loadUserData() {
+    function loadUserData(uid) {
         $(".button-container").hide();
-        var userId = currentUser.uid;
-        ledStatusRef = database.ref('users/' + userId + '/LedStatus');
-        temperatureRef = database.ref('users/' + userId + '/TemperatureReadings');
+        ledStatusRef = database.ref('users/' + uid + '/LedStatus');
+        temperatureRef = database.ref('users/' + uid + '/TemperatureReadings');
 
         ledStatusRef.on('value', function(snapshot) {
             var status = snapshot.val();
