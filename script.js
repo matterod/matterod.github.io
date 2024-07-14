@@ -32,46 +32,45 @@ $(document).ready(function(){
     }
 
     $("#login-button").click(function(){
-        var username = $("#username").val();
-        var password = $("#password").val();
-
-        database.ref('users/' + username).once('value').then(function(snapshot) {
-            var userData = snapshot.val();
-            if (userData && userData.password === password) {
-                currentUser = username;
-                userNumber = username.match(/\d+/)[0]; // Extrae el número del usuario
+        var provider = new firebase.auth.GoogleAuthProvider();
+        firebase.auth().signInWithPopup(provider)
+            .then((result) => {
+                currentUser = result.user;
+                userNumber = currentUser.uid.match(/\d+/)[0]; // Extrae el número del usuario
                 showControlPanel();
                 createChart(); // Asegúrate de crear el gráfico antes de cargar los datos
                 loadUserData();
-            } else {
-                $("#login-error").text("Invalid username or password.");
-            }
-        }).catch(function(error) {
-            console.error('Error:', error);
-            $("#login-error").text("An error occurred.");
-        });
+            })
+            .catch((error) => {
+                $("#login-error").text("Login failed: " + error.message);
+                console.error('Error:', error);
+            });
     });
 
     $("#logout-button").click(function(){
-        currentUser = null;
-        hideControlPanel();
-        if (temperatureRef) temperatureRef.off();
-        if (ledStatusRef) ledStatusRef.off();
-        if (chart) chart.destroy();
-        temperatureData = [];
-        chart = null; // Asegúrate de restablecer el gráfico
+        firebase.auth().signOut().then(() => {
+            currentUser = null;
+            hideControlPanel();
+            if (temperatureRef) temperatureRef.off();
+            if (ledStatusRef) ledStatusRef.off();
+            if (chart) chart.destroy();
+            temperatureData = [];
+            chart = null; // Asegúrate de restablecer el gráfico
+        });
     });
 
     function loadUserData() {
         $(".button-container").hide();
         $("#button-container" + userNumber).show();
 
-        ledStatusRef = database.ref('users/' + currentUser + '/Led' + userNumber + 'Status');
-        temperatureRef = database.ref('users/' + currentUser + '/TemperatureReadings');
+        var userId = currentUser.uid;
+
+        ledStatusRef = database.ref('users/' + userId + '/LedStatus');
+        temperatureRef = database.ref('users/' + userId + '/TemperatureReadings');
 
         ledStatusRef.on('value', function(snapshot) {
             var status = snapshot.val();
-            updateButton($("#toggle" + userNumber), status);
+            updateButton($("#toggle1"), status);
         });
 
         temperatureRef.on('value', function(snapshot) {
@@ -92,12 +91,12 @@ $(document).ready(function(){
             }
         });
 
-        $("#toggle" + userNumber).click(function(){
+        $("#toggle1").click(function(){
             ledStatusRef.once('value').then(function(snapshot) {
                 var currentStatus = snapshot.val();
                 var newStatus = currentStatus === "1" ? "0" : "1";
                 ledStatusRef.set(newStatus);
-                updateButton($("#toggle" + userNumber), newStatus);
+                updateButton($("#toggle1"), newStatus);
             });
         });
     }
