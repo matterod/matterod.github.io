@@ -25,12 +25,6 @@ h1 {
     justify-content: center;
 }
 
-#login-container input {
-    margin: 0.5rem;
-    padding: 0.5rem;
-    font-size: 1rem;
-}
-
 #login-container button {
     margin: 0.5rem;
     padding: 0.5rem;
