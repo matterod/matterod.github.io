@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de LEDs y Monitor de Temperatura</title>
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -17,9 +18,7 @@
     <div class="container">
         <h1>Control de LEDs y Monitor de Temperatura</h1>
         <div id="login-container">
-            <input type="text" id="username" placeholder="Username">
-            <input type="password" id="password" placeholder="Password">
-            <button id="login-button">Login</button>
+            <button id="login-button">Login with Google</button>
             <p id="login-error"></p>
         </div>
         <div id="control-container" style="display:none;">
