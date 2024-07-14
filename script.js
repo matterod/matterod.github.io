@@ -14,7 +14,6 @@ firebase.initializeApp(firebaseConfig);
 $(document).ready(function(){
     var database = firebase.database();
     var currentUser = null;
-    var userNumber = null;
     var temperatureRef = null;
     var ledStatusRef = null;
     var temperatureData = [];
@@ -36,7 +35,6 @@ $(document).ready(function(){
         firebase.auth().signInWithPopup(provider)
             .then((result) => {
                 currentUser = result.user;
-                userNumber = currentUser.uid.match(/\d+/)[0]; // Extrae el número del usuario
                 showControlPanel();
                 createChart(); // Asegúrate de crear el gráfico antes de cargar los datos
                 loadUserData();
@@ -61,10 +59,7 @@ $(document).ready(function(){
 
     function loadUserData() {
         $(".button-container").hide();
-        $("#button-container" + userNumber).show();
-
         var userId = currentUser.uid;
-
         ledStatusRef = database.ref('users/' + userId + '/LedStatus');
         temperatureRef = database.ref('users/' + userId + '/TemperatureReadings');
 
