@@ -1,5 +1,5 @@
 var firebaseConfig = {
-    apiKey: "AIzaSyANGLfDfRnsIfN3k-COWI22Y0bi8emK4Os",
+    apiKey: "AIzaSyANGLfDfRnsIfN3k-COWI22Y0bi8emK4Os",  // Reemplaza con tu clave API
     authDomain: "esp32rinconada.firebaseapp.com",
     databaseURL: "https://esp32rinconada-default-rtdb.firebaseio.com",
     projectId: "esp32rinconada",
@@ -35,15 +35,9 @@ $(document).ready(function(){
         firebase.auth().signInWithPopup(provider)
             .then((result) => {
                 currentUser = result.user;
-                // Obtener UID del usuario autenticado
-                var uid = currentUser.uid;
+                var uid = currentUser.uid; // Obtener el UID del usuario autenticado
                 console.log("Usuario autenticado con UID:", uid);
                 
-                // Asociar dispositivo con el usuario
-                database.ref('devices/device1').set({
-                    owner: uid
-                });
-
                 showControlPanel();
                 createChart(); // Asegúrate de crear el gráfico antes de cargar los datos
                 loadUserData(uid); // Pasar el UID para cargar datos específicos del usuario
@@ -67,13 +61,16 @@ $(document).ready(function(){
     });
 
     function loadUserData(uid) {
-        $(".button-container").hide();
+        $(".button-container").hide(); // Ocultar los contenedores de botones por defecto
+
+        // Referencias a la base de datos de Firebase
         ledStatusRef = database.ref('users/' + uid + '/LedStatus');
         temperatureRef = database.ref('users/' + uid + '/TemperatureReadings');
 
         ledStatusRef.on('value', function(snapshot) {
             var status = snapshot.val();
-            updateButton($("#toggle1"), status);
+            updateButton($("#toggle1"), status); // Actualizar el botón con el estado del LED
+            $("#button-container1").show(); // Mostrar el contenedor del botón
         });
 
         temperatureRef.on('value', function(snapshot) {
@@ -117,63 +114,4 @@ $(document).ready(function(){
     function createChart() {
         var ctx = document.getElementById('temperatureChart').getContext('2d');
         chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [], // Las etiquetas se actualizarán en tiempo real
-                datasets: [{
-                    label: 'Temperatura',
-                    data: temperatureData,
-                    borderColor: '#21ecf3',
-                    backgroundColor: 'rgba(33, 236, 243, 0.2)',
-                    pointBackgroundColor: '#21ecf3',
-                    pointBorderColor: '#21ecf3',
-                    fill: true,
-                    tension: 0.1
-                }]
-            },
-            options: {
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'minute'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Tiempo'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Temperatura (°C)'
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: {
-                            color: '#ffffff'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function updateChart(temperature) {
-        var now = new Date();
-        temperatureData.push({ x: now, y: temperature });
-        if (temperatureData.length > 20) {
-            temperatureData.shift();
-        }
-        chart.data.labels.push(now);
-        if (chart.data.labels.length > 20) {
-            chart.data.labels.shift();
-        }
-        chart.update();
-    }
-
-    hideControlPanel(); // Oculta los botones al cargar la página
-});
+            type:
