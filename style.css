@@ -41,7 +41,7 @@ h1 {
     display: none;
 }
 
-#temperature-container {
+#info-container {
     margin-bottom: 2rem;
     text-align: center;
 }
@@ -49,6 +49,11 @@ h1 {
 #temperature {
     font-size: 2rem;
     color: #21ecf3;
+}
+
+#time {
+    font-size: 1rem;
+    color: #ffffff;
 }
 
 #temperatureChart {
