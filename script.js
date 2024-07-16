@@ -17,7 +17,6 @@ $(document).ready(function(){
     var temperatureRef = null;
     var ledStatusRef = null;
     var temperatureData = [];
-    var chart = null;
 
     function showControlPanel() {
         $("#login-container").hide();
@@ -54,9 +53,8 @@ $(document).ready(function(){
             hideControlPanel();
             if (temperatureRef) temperatureRef.off();
             if (ledStatusRef) ledStatusRef.off();
-            if (chart) chart.destroy();
             temperatureData = [];
-            chart = null; // Asegúrate de restablecer el gráfico
+            Plotly.purge('temperature-graph');
         });
     });
 
@@ -74,21 +72,18 @@ $(document).ready(function(){
         });
 
         temperatureRef.on('value', function(snapshot) {
-            var readings = snapshot.val();
             temperatureData = [];
             var latestTemperature = null;
-            for (var timestamp in readings) {
-                var temperature = readings[timestamp];
-                temperatureData.push({ x: new Date(parseInt(timestamp)), y: temperature });
-                latestTemperature = temperature; // Actualiza la temperatura más reciente
-            }
+            snapshot.forEach(function(childSnapshot) {
+                var reading = childSnapshot.val();
+                var timestamp = childSnapshot.key;
+                temperatureData.push({ x: new Date(parseInt(timestamp)), y: reading });
+                latestTemperature = reading; // Actualiza la temperatura más reciente
+            });
             if (latestTemperature !== null) {
                 $("#temperature").text(latestTemperature + " °C"); // Muestra la temperatura más reciente
             }
-            if (chart) {
-                chart.data.datasets[0].data = temperatureData;
-                chart.update();
-            }
+            Plotly.react('temperature-graph', [getTemperatureTrace(temperatureData)], getLayout());
         });
 
         $("#toggle1").click(function(){
@@ -112,64 +107,41 @@ $(document).ready(function(){
     }
 
     function createChart() {
-        var ctx = document.getElementById('temperatureChart').getContext('2d');
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [], // Las etiquetas se actualizarán en tiempo real
-                datasets: [{
-                    label: 'Temperatura',
-                    data: temperatureData,
-                    borderColor: '#21ecf3',
-                    backgroundColor: 'rgba(33, 236, 243, 0.2)',
-                    pointBackgroundColor: '#21ecf3',
-                    pointBorderColor: '#21ecf3',
-                    fill: true,
-                    tension: 0.1
-                }]
-            },
-            options: {
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'minute'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Tiempo'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Temperatura (°C)'
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: {
-                            color: '#ffffff'
-                        }
-                    }
-                }
-            }
-        });
+        Plotly.newPlot('temperature-graph', [getTemperatureTrace([])], getLayout());
     }
 
-    function updateChart(temperature) {
-        var now = new Date();
-        temperatureData.push({ x: now, y: temperature });
-        if (temperatureData.length > 20) {
-            temperatureData.shift();
-        }
-        chart.data.labels.push(now);
-        if (chart.data.labels.length > 20) {
-            chart.data.labels.shift();
-        }
-        chart.update();
+    function getTemperatureTrace(data) {
+        return {
+            x: data.map(d => d.x),
+            y: data.map(d => d.y),
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Temperatura',
+            line: { color: '#21ecf3' }
+        };
+    }
+
+    function getLayout() {
+        return {
+            title: 'Temperatura Actual',
+            xaxis: {
+                title: 'Tiempo',
+                rangeselector: {
+                    buttons: [
+                        { count: 1, label: '1h', step: 'hour', stepmode: 'backward' },
+                        { count: 6, label: '6h', step: 'hour', stepmode: 'backward' },
+                        { count: 1, label: '1d', step: 'day', stepmode: 'backward' },
+                        { count: 7, label: '1w', step: 'day', stepmode: 'backward' },
+                        { step: 'all' }
+                    ]
+                },
+                rangeslider: { visible: true },
+                type: 'date'
+            },
+            yaxis: {
+                title: 'Temperatura (°C)'
+            }
+        };
     }
 
     hideControlPanel(); // Oculta los botones al cargar la página
