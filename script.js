@@ -1,12 +1,12 @@
 var firebaseConfig = {
     apiKey: "AIzaSyANGLfDfRnsIfN3k-COWI22Y0bi8emK4Os",
-  authDomain: "esp32rinconada.firebaseapp.com",
-  databaseURL: "https://esp32rinconada-default-rtdb.firebaseio.com",
-  projectId: "esp32rinconada",
-  storageBucket: "esp32rinconada.appspot.com",
-  messagingSenderId: "82707406557",
-  appId: "1:82707406557:web:62f5993a30a39b7f130534",
-  measurementId: "G-84QEWN29ZH"
+    authDomain: "esp32rinconada.firebaseapp.com",
+    databaseURL: "https://esp32rinconada-default-rtdb.firebaseio.com",
+    projectId: "esp32rinconada",
+    storageBucket: "esp32rinconada.appspot.com",
+    messagingSenderId: "82707406557",
+    appId: "1:82707406557:web:62f5993a30a39b7f130534",
+    measurementId: "G-84QEWN29ZH"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -22,7 +22,6 @@ $(document).ready(function(){
     function showControlPanel() {
         $("#login-container").hide();
         $("#control-container").show();
-        updateTime();
     }
 
     function hideControlPanel() {
@@ -85,6 +84,7 @@ $(document).ready(function(){
             }
             if (latestTemperature !== null) {
                 $("#temperature").text(latestTemperature + " °C"); // Muestra la temperatura más reciente
+                updateAnimation(latestTemperature);
             }
             if (chart) {
                 chart.data.datasets[0].data = temperatureData;
@@ -153,21 +153,6 @@ $(document).ready(function(){
                         labels: {
                             color: '#ffffff'
                         }
-                    },
-                    zoom: {
-                        pan: {
-                            enabled: true,
-                            mode: 'x',
-                        },
-                        zoom: {
-                            wheel: {
-                                enabled: true,
-                            },
-                            pinch: {
-                                enabled: true
-                            },
-                            mode: 'x',
-                        }
                     }
                 }
             }
@@ -177,18 +162,20 @@ $(document).ready(function(){
     function updateChart(temperature) {
         var now = new Date();
         temperatureData.push({ x: now, y: temperature });
-        if (temperatureData.length > 336) {
+        if (temperatureData.length > 336) {  // 336 puntos representan una semana con una lectura por hora
             temperatureData.shift();
         }
         chart.update();
     }
 
-    function updateTime() {
-        setInterval(() => {
-            const now = new Date();
-            const options = { weekday: 'long', hour: '2-digit', minute: '2-digit' };
-            $("#time").text(now.toLocaleDateString('es-ES', options));
-        }, 1000);
+    function updateAnimation(temperature) {
+        var animationContainer = $("#animation-container");
+        animationContainer.empty(); // Limpiar cualquier animación previa
+        if (temperature < 10) {
+            animationContainer.append('<i class="fas fa-snowflake cold"></i>'); // Agregar animación de frío
+        } else {
+            animationContainer.append('<i class="fas fa-sun warm"></i>'); // Agregar animación de tibio
+        }
     }
 
     hideControlPanel(); // Oculta los botones al cargar la página
