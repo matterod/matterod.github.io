@@ -9,7 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.4/css/all.css">
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -23,12 +22,10 @@
             <p id="login-error"></p>
         </div>
         <div id="control-container" style="display:none;">
-            <div id="info-container">
-                <h2>Clima</h2>
-                <p id="temperature">Cargando...</p>
-                <p id="time"></p>
-            </div>
             <div id="temperature-container">
+                <h2>Temperatura Actual</h2>
+                <p id="temperature">Cargando...</p>
+                <div id="animation-container"></div>
                 <canvas id="temperatureChart"></canvas>
             </div>
             <div class="button-container" id="button-container1" style="display:none;">
