@@ -1,12 +1,12 @@
 var firebaseConfig = {
-    apiKey: "AIzaSyANGLfDfRnsIfN3k-COWI22Y0bi8emK4Os",  // Reemplaza con tu clave API
-    authDomain: "esp32rinconada.firebaseapp.com",
-    databaseURL: "https://esp32rinconada-default-rtdb.firebaseio.com",
-    projectId: "esp32rinconada",
-    storageBucket: "esp32rinconada.appspot.com",
-    messagingSenderId: "82707406557",
-    appId: "1:82707406557:web:62f5993a30a39b7f130534",
-    measurementId: "G-84QEWN29ZH"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID",
+    measurementId: "YOUR_MEASUREMENT_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -22,6 +22,7 @@ $(document).ready(function(){
     function showControlPanel() {
         $("#login-container").hide();
         $("#control-container").show();
+        updateTime();
     }
 
     function hideControlPanel() {
@@ -124,7 +125,7 @@ $(document).ready(function(){
                     pointBackgroundColor: '#21ecf3',
                     pointBorderColor: '#21ecf3',
                     fill: true,
-                    tension: 0.1
+                    tension: 0.4
                 }]
             },
             options: {
@@ -180,6 +181,14 @@ $(document).ready(function(){
             temperatureData.shift();
         }
         chart.update();
+    }
+
+    function updateTime() {
+        setInterval(() => {
+            const now = new Date();
+            const options = { weekday: 'long', hour: '2-digit', minute: '2-digit' };
+            $("#time").text(now.toLocaleDateString('es-ES', options));
+        }, 1000);
     }
 
     hideControlPanel(); // Oculta los botones al cargar la página
