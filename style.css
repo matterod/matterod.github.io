@@ -41,7 +41,7 @@ h1 {
     display: none;
 }
 
-#info-container {
+#temperature-container {
     margin-bottom: 2rem;
     text-align: center;
 }
@@ -49,11 +49,6 @@ h1 {
 #temperature {
     font-size: 2rem;
     color: #21ecf3;
-}
-
-#time {
-    font-size: 1rem;
-    color: #ffffff;
 }
 
 #temperatureChart {
@@ -96,4 +91,28 @@ h1 {
 .btn.off {
     background-color: #444;
     box-shadow: none;
+}
+
+#animation-container {
+    margin-top: 20px;
+}
+
+.cold {
+    animation: coldAnimation 2s infinite;
+}
+
+@keyframes coldAnimation {
+    0% { color: #00f; }
+    50% { color: #0ff; }
+    100% { color: #00f; }
+}
+
+.warm {
+    animation: warmAnimation 2s infinite;
+}
+
+@keyframes warmAnimation {
+    0% { color: #f00; }
+    50% { color: #ff0; }
+    100% { color: #f00; }
 }
