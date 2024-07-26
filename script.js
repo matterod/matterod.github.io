@@ -182,4 +182,3 @@ $(document).ready(function(){
 
     hideControlPanel(); // Oculta los botones al cargar la página
 });
-
