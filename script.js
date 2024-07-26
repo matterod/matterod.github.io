@@ -77,9 +77,11 @@ $(document).ready(function(){
             var readings = snapshot.val();
             temperatureData = [];
             var latestTemperature = null;
-            for (var timestamp in readings) {
-                var temperature = readings[timestamp];
-                temperatureData.push({ x: new Date(parseInt(timestamp)), y: temperature });
+            for (var key in readings) {
+                var data = readings[key];
+                var timestamp = data.timestamp; // Asegúrate de usar la marca de tiempo del servidor
+                var temperature = data.temperature;
+                temperatureData.push({ x: new Date(timestamp), y: temperature });
                 latestTemperature = temperature; // Actualiza la temperatura más reciente
             }
             if (latestTemperature !== null) {
@@ -180,3 +182,4 @@ $(document).ready(function(){
 
     hideControlPanel(); // Oculta los botones al cargar la página
 });
+
